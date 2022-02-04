@@ -27,10 +27,15 @@ const firestore = firebase.firestore();
 
 
 //Twilio setups
-const accountSid = 'AC5b127cf7ddfff2036e3003974fbe158d'; 
-const token = firestore.collection('verify').doc(`twilioToken`).get()
-const authToken = token.data().token 
-const client = require('twilio')(accountSid, authToken); 
+var accountSid 
+var client
+var authToken
+firestore.collection('verify').doc('twilioToken').get()
+.then(token => {
+    accountSid = token.data().accountSid
+    authToken = token.data().authToken
+    client = require('twilio')(accountSid, authToken)
+})
 
 //generate and store an access code in database, return the code
 async function CreateNewAccessCode(phoneNumber){
@@ -42,14 +47,14 @@ async function CreateNewAccessCode(phoneNumber){
     })
     
     //send sms with verification code to phone number
-    /*client.messages
+    client.messages
     .create({ 
         body: `Your verification code is: ${sixDigit}`,  
         messagingServiceSid: 'MG11503eb7f5a5fb7566b98caf2a5cef6f',      
         to: `+1${phoneNumber}`
     }) 
     .then(message => console.log(message.sid)) 
-    .done();*/
+    .done();
     return sixDigit
 }
 
