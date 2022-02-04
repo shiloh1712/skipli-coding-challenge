@@ -5,12 +5,6 @@ const bodyParser = require('body-parser');
 const firebase = require('firebase');
 
 const port = 8080
-
-//Twilio setups
-const accountSid = 'AC5b127cf7ddfff2036e3003974fbe158d'; 
-const authToken = '395dade0e4cc829465256fb12b8a3b3f'; 
-const client = require('twilio')(accountSid, authToken); 
-
 const app = express();
 
 app.use(express.json());
@@ -30,6 +24,13 @@ const firebaseConfig = {
   }
 firebase.initializeApp(firebaseConfig);
 const firestore = firebase.firestore();
+
+
+//Twilio setups
+const accountSid = 'AC5b127cf7ddfff2036e3003974fbe158d'; 
+const token = firestore.collection('verify').doc(`twilioToken`).get()
+const authToken = token.data().token 
+const client = require('twilio')(accountSid, authToken); 
 
 //generate and store an access code in database, return the code
 async function CreateNewAccessCode(phoneNumber){
@@ -71,7 +72,7 @@ async function ValidateAccessCode(accessCode, phoneNumber){
 
 app.post('/verify',express.json({type: '*/*'}), async (req, res, next) => {
     try {
-        
+        console.log(authToken)
         const accessCode = req.body.code
         const phoneNumber = req.body.phone
 
